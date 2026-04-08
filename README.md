@@ -453,6 +453,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding standards, 
 
 See [SECURITY.md](SECURITY.md) for reporting vulnerabilities.
 
+## Acknowledgements
+
+Built on top of [Superpowers](https://github.com/obra/superpowers) by Jesse Vincent — the skill library that teaches Claude brainstorming, planning, TDD, systematic debugging, and parallel dispatch. Ticket Pilot wouldn't exist without it.
+
 ## License
 
 [MIT](LICENSE)
