@@ -86,15 +86,13 @@ If the user says "setup ticket-pilot" or "configure ticket-pilot", run the setup
 
 ### Reconfiguring
 
-If the user says "reconfigure ticket-pilot", "switch to Jira", "switch to Plane", "change project", or "update tracker config":
+If the user says **"reconfigure"**, re-run the full setup flow:
 
 1. **Do NOT run `check_env.py` first.** The user wants to change their config regardless of current state.
 2. Ask: **"Are you using Plane or Jira?"** (same flow as initial setup)
 3. Collect the relevant variables
 4. Run `python scripts/setup_env.py` with the new values — it will replace the existing config block in the shell profile
 5. Tell the user to run `source ~/.zshrc` (or `~/.bashrc`)
-
-This works for all reconfiguration scenarios: switching trackers, changing projects, updating API keys, or switching auth methods.
 
 ## Dispatching the right action
 
@@ -107,7 +105,7 @@ Read the user's request and decide which action they want:
 | "dispatch PROJ-12 PROJ-13 PROJ-14", "work on these in parallel: ..." | **Parallel** flow |
 | "list tickets", "what am I working on", "show in-flight" | Run `list_tickets.py` |
 | "status of PROJ-12" | Run `resume_ticket.py PROJ-12` (it prints a summary without changing state) |
-| "reconfigure", "switch to Jira", "change project", "update config" | **Reconfigure** flow (above) |
+| "reconfigure" | **Reconfigure** flow — re-prompts all tracker settings |
 
 If the user gives a single ticket key, always check whether state already exists for it before starting. The `start_ticket.py` script does this automatically and will tell you to resume if so.
 
