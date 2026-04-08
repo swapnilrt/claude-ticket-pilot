@@ -1,0 +1,27 @@
+# Credentials
+.env
+
+# Runtime data
+state/
+repos-cache/
+worktrees/
+_test_run/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# IDE / editor
+.claude/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Internal planning docs (not for distribution)
+docs/specs/
+docs/plans/
