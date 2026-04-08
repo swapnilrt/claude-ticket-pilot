@@ -45,7 +45,7 @@ You have a ticket. You want Claude to implement it. But real engineering work is
 /reload-plugins
 ```
 
-The installer handles Python dependencies, configures your tracker connection interactively, and installs the [superpowers](https://github.com/anthropics/claude-plugins-official) dependency automatically.
+On first use, Claude will detect missing environment variables and walk you through tracker setup interactively. The [superpowers](https://github.com/obra/superpowers) dependency is installed automatically.
 
 ### Add a spec block to your ticket
 
@@ -352,9 +352,14 @@ README.md           # updated with usage examples
 
 ```
 claude-ticket-pilot/
-├── SKILL.md                      # Instructions Claude reads at runtime
-├── plugin.json                   # Plugin manifest (name, version, dependencies)
-├── post_install.py               # Interactive setup on install
+├── .claude-plugin/
+│   ├── plugin.json               # Plugin manifest for Claude Code marketplace
+│   └── marketplace.json          # Marketplace catalog
+├── skills/
+│   └── ticket-pilot/
+│       └── SKILL.md              # Instructions Claude reads at runtime
+├── SKILL.md                      # Root copy (kept in sync with skills/)
+├── plugin.json                   # Extended manifest (metadata, env var schema)
 ├── requirements.txt              # requests, pyyaml
 ├── lib/
 │   ├── tracker_adapter.py        # Abstract interface (TrackerAdapter ABC)
@@ -365,6 +370,8 @@ claude-ticket-pilot/
 │   └── git_workspace.py          # Clone-on-demand + worktree management
 ├── scripts/
 │   ├── _common.py                # Bootstrap: env vars, adapter factory, path helpers
+│   ├── check_env.py              # Validate required env vars are set
+│   ├── setup_env.py              # Write tracker config to shell profile
 │   ├── start_ticket.py           # Initialize ticket: fetch → parse → worktree → state
 │   ├── resume_ticket.py          # Load state and print context for Claude
 │   ├── save_progress.py          # Persist phase transitions
@@ -395,7 +402,7 @@ Register it in `_common.py`'s `get_tracker()` factory and you're done.
 
 ### Prerequisites
 
-- Python 3.9+
+- Python 3.6+
 - `requests` and `pyyaml` (`pip install -r requirements.txt`)
 
 ### Run Tests
