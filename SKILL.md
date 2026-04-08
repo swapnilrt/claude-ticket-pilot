@@ -23,7 +23,44 @@ Optional:
 - `PLANE_POLL_INTERVAL` (seconds between tracker checks, default 120)
 - `PLANE_POLL_TIMEOUT` (max seconds to wait for reply, default 3600)
 
-If any are missing, the scripts will fail with a clear error. If you see such an error, tell the user which variable is missing and stop.
+### Setup check (MUST run before any action)
+
+**Before executing any command**, check whether the required environment variables are set by running:
+
+```bash
+python scripts/check_env.py
+```
+
+If `check_env.py` reports missing variables, **do not proceed with the user's request**. Instead, walk the user through setup:
+
+1. Ask: **"Are you using Plane or Jira?"**
+2. Based on their answer, ask only the relevant variables:
+
+   **If Plane:**
+   - `TRACKER_BASE_URL` — e.g. `http://localhost:8080`
+   - `TRACKER_API_KEY` — their Plane API key
+   - `TRACKER_WORKSPACE` — workspace slug
+   - `TRACKER_PROJECT` — project UUID
+
+   **If Jira Cloud:**
+   - `TRACKER_BASE_URL` — e.g. `https://yourorg.atlassian.net`
+   - `TRACKER_API_KEY` — API token
+   - `TRACKER_PROJECT` — project key (e.g. `PROJ`)
+   - `TRACKER_AUTH_TYPE` — ask: "Bearer token or basic auth?" (default: bearer)
+   - If basic auth: `TRACKER_USERNAME` — their email
+
+   **If Jira Server / Data Center:**
+   - `TRACKER_BASE_URL` — e.g. `https://jira.yourcompany.com`
+   - `TRACKER_API_KEY` — personal access token
+   - `TRACKER_PROJECT` — project key (e.g. `PROJ`)
+   - `TRACKER_AUTH_TYPE` — ask: "Bearer token or basic auth?" (default: bearer)
+   - If basic auth: `TRACKER_USERNAME` — their username
+
+3. Once you have all values, run `python scripts/setup_env.py` with the collected values to save them to the user's shell profile
+4. Tell the user to restart their terminal or run `source ~/.zshrc` (or `~/.bashrc`) to pick up the new variables
+5. Then proceed with the original request
+
+If the user says "setup ticket-pilot" or "configure ticket-pilot", run the setup check directly.
 
 ## Dispatching the right action
 
