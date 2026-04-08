@@ -18,5 +18,5 @@
     }
   },
   "supported_trackers": ["plane", "jira-cloud", "jira-server"],
-  "repository": "https://github.com/yourorg/claude-ticket-pilot"
+  "repository": "https://github.com/swapnilrt/claude-ticket-pilot"
 }
