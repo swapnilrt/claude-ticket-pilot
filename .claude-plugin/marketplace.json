@@ -1,0 +1,13 @@
+{
+  "name": "swapnilrt-claude-ticket-pilot",
+  "owner": {
+    "name": "swapnilrt"
+  },
+  "plugins": [
+    {
+      "name": "claude-ticket-pilot",
+      "source": "..",
+      "description": "Autonomous ticket workflow — brainstorm, plan, build, push via Jira or Plane"
+    }
+  ]
+}
