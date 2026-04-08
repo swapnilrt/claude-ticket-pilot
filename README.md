@@ -35,7 +35,7 @@ You have a ticket. You want Claude to implement it. But real engineering work is
 ### Install
 
 ```bash
-claude plugins install github:yourorg/claude-ticket-pilot
+claude plugins install github:swapnilrt/claude-ticket-pilot
 ```
 
 The installer handles Python dependencies, configures your tracker connection interactively, and installs the [superpowers](https://github.com/anthropics/claude-plugins-official) dependency automatically.
