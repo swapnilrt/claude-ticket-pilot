@@ -239,6 +239,55 @@ base_branch: main
 
 ---
 
+## Ideal Ticket Example
+
+Here's a complete example of a well-structured ticket that Ticket Pilot can work on effectively:
+
+### Title
+**Add rate limiting to the /api/users endpoint**
+
+### Description
+
+The `/api/users` endpoint currently has no rate limiting. We need to add a sliding-window rate limiter to prevent abuse.
+
+**Requirements:**
+- Limit to 100 requests per minute per API key
+- Return `429 Too Many Requests` with a `Retry-After` header when exceeded
+- Log rate-limited requests for monitoring
+- Add unit tests for the rate limiter
+
+**Acceptance criteria:**
+- [ ] Rate limiter middleware added to `/api/users`
+- [ ] Returns 429 with correct headers when limit exceeded
+- [ ] Existing tests still pass
+- [ ] New tests cover normal and rate-limited scenarios
+
+````markdown
+```claude
+repo: git@github.com:yourorg/yourapi.git
+base_branch: main
+working_dir: services/api
+```
+````
+
+### What makes a good ticket
+
+| Element | Why it matters |
+|---|---|
+| **Clear title** | Claude uses it to understand scope at a glance |
+| **Specific requirements** | Reduces brainstorm questions, speeds up planning |
+| **Acceptance criteria** | Claude uses these to verify the implementation and write tests |
+| **`claude` config block** | Required — tells Claude which repo, branch, and subdirectory to work in |
+| **Scope boundaries** | Prevents Claude from over-engineering or drifting into unrelated changes |
+
+**Tips:**
+- Be specific about behavior ("return 429 with Retry-After header") rather than vague ("handle errors")
+- Mention existing patterns to follow ("use the same middleware pattern as auth.py")
+- If you want to skip brainstorming, add `skip_brainstorm: true` to the config block
+- For monorepos, always set `working_dir` to narrow the codebase Claude reads
+
+---
+
 ## Architecture
 
 ```
