@@ -1,4 +1,5 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "swapnilrt-claude-ticket-pilot",
   "owner": {
     "name": "swapnilrt"
@@ -6,7 +7,7 @@
   "plugins": [
     {
       "name": "claude-ticket-pilot",
-      "source": "..",
+      "source": ".",
       "description": "Autonomous ticket workflow — brainstorm, plan, build, push via Jira or Plane"
     }
   ]
