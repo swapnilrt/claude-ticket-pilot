@@ -7,6 +7,24 @@ description: Work on tickets end-to-end across Jira or Plane. Fetches a ticket b
 
 This skill drives a single ticket (from Jira or Plane) through brainstorm → plan → approve → build → push, with full state persistence so work can be paused and resumed across sessions. It also supports dispatching multiple tickets to parallel terminals.
 
+## Plugin root
+
+All scripts referenced below live in `scripts/` relative to the **plugin root**, not this skill file. The plugin root is two directories up from this SKILL.md.
+
+**Before running any script**, determine the plugin root:
+
+```bash
+TICKET_PILOT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+```
+
+Or simply use the absolute path. If this skill was loaded from the plugin cache, the root will be something like `~/.claude/plugins/cache/swapnilrt-claude-ticket-pilot/claude-ticket-pilot/<version>/`. Find it by running:
+
+```bash
+find ~/.claude/plugins/cache -path "*/claude-ticket-pilot/*/scripts/check_env.py" -print -quit
+```
+
+Then set `TICKET_PILOT_ROOT` to the directory containing `scripts/`. **All `python scripts/...` commands below must be run from `$TICKET_PILOT_ROOT`.**
+
 ## Required environment
 
 The skill expects these environment variables to be set in the user's shell:
