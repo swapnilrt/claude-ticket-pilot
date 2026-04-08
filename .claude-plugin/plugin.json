@@ -5,5 +5,5 @@
   "author": {
     "name": "swapnilrt"
   },
-  "dependencies": ["superpowers"]
+  "dependencies": ["superpowers@claude-plugins-official"]
 }
