@@ -5,21 +5,5 @@
   "author": {
     "name": "swapnilrt"
   },
-  "skill_entry": "../SKILL.md",
-  "dependencies": {
-    "plugins": ["superpowers"],
-    "pip": ["requests", "pyyaml"]
-  },
-  "env_vars": {
-    "required": ["TRACKER_TYPE", "TRACKER_BASE_URL", "TRACKER_API_KEY", "TRACKER_PROJECT"],
-    "optional": {
-      "TRACKER_AUTH_TYPE": "bearer",
-      "TRACKER_USERNAME": "",
-      "TRACKER_WORKSPACE": "",
-      "PLANE_POLL_INTERVAL": "120",
-      "PLANE_POLL_TIMEOUT": "3600"
-    }
-  },
-  "supported_trackers": ["plane", "jira-cloud", "jira-server"],
-  "repository": "https://github.com/swapnilrt/claude-ticket-pilot"
+  "dependencies": ["superpowers"]
 }
