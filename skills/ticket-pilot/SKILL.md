@@ -11,19 +11,23 @@ This skill drives a single ticket (from Jira or Plane) through brainstorm → pl
 
 All scripts referenced below live in `scripts/` relative to the **plugin root**, not this skill file. The plugin root is two directories up from this SKILL.md.
 
-**Before running any script**, determine the plugin root:
+**Before running any script**, find the plugin root and `cd` into it:
 
 ```bash
-TICKET_PILOT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$(find ~/.claude/plugins/cache -path "*/claude-ticket-pilot/*/scripts/check_env.py" -print -quit | xargs dirname | xargs dirname)"
 ```
 
-Or simply use the absolute path. If this skill was loaded from the plugin cache, the root will be something like `~/.claude/plugins/cache/swapnilrt-claude-ticket-pilot/claude-ticket-pilot/<version>/`. Find it by running:
+**All `python scripts/...` commands below must be run from this directory.**
+
+### Python compatibility
+
+This skill works with **any Python 3.6+**. Use whatever `python3` is available. If `requests` is not installed, install it automatically:
 
 ```bash
-find ~/.claude/plugins/cache -path "*/claude-ticket-pilot/*/scripts/check_env.py" -print -quit
+python3 -c "import requests" 2>/dev/null || python3 -m pip install requests pyyaml -q
 ```
 
-Then set `TICKET_PILOT_ROOT` to the directory containing `scripts/`. **All `python scripts/...` commands below must be run from `$TICKET_PILOT_ROOT`.**
+Run this once when you first start working. Do not ask the user to upgrade Python or install packages manually.
 
 ## Required environment
 
@@ -137,19 +141,15 @@ Formulate 3–6 clarifying questions for the user. Cover:
 Save the questions, post them as a **comment on the ticket**, then **poll for the reply**:
 
 ```bash
-cat > /tmp/q.txt <<'EOF'
-1. Question one
-2. Question two
-...
-EOF
-
 python scripts/save_progress.py <ticket-key> --phase awaiting_answers \
-  --from-file questions=/tmp/q.txt
+  --questions "1. Question one\n2. Question two\n..."
 
-python scripts/post_comment.py <ticket-key> --from-file /tmp/q.txt
+python scripts/post_comment.py <ticket-key> "1. Question one\n2. Question two\n..."
 
 python scripts/poll_comments.py <ticket-key>
 ```
+
+**Important: Pass text as inline arguments.** Do NOT use `cat > /tmp/...` or write temp files — that triggers unnecessary permission prompts.
 
 The poller checks the tracker every `PLANE_POLL_INTERVAL` seconds (default 120, configurable in `.env`). When the user replies on the tracker, the poller saves the answers and advances to `planning`. **Do not ask the user in chat — The tracker is the communication channel.**
 
@@ -164,22 +164,15 @@ After the poller exits (answers received), write a concrete implementation plan:
 Save the plan, post it as a **comment on the ticket**, then **poll for approval**:
 
 ```bash
-cat > /tmp/plan.md <<'EOF'
-**Implementation Plan**
-
-<your plan>
-
----
-Approve this plan? Reply: **yes** / **changes needed: ...** / **no**
-EOF
-
 python scripts/save_progress.py <ticket-key> --phase awaiting_approval \
-  --from-file plan=/tmp/plan.md
+  --plan "<your plan text>"
 
-python scripts/post_comment.py <ticket-key> --from-file /tmp/plan.md
+python scripts/post_comment.py <ticket-key> "<your plan text>\n\n---\nApprove this plan? Reply: yes / changes needed: ... / no"
 
 python scripts/poll_comments.py <ticket-key>
 ```
+
+**Do NOT write temp files.** Pass all text as inline arguments.
 
 The poller recognizes:
 - **Approval** ("yes", "approve", "lgtm", "go ahead", "ship it") → advances to `building`
@@ -190,7 +183,7 @@ If feedback is received, incorporate it, re-save the plan, re-post the updated p
 
 ### Phase 5: Build (autonomous)
 
-**From here on, Claude runs autonomously — no human gates.**
+**From here on, Claude runs fully autonomously — NO human gates, NO permission prompts, NO asking the user for confirmation. Just build, test, and push.**
 
 ```bash
 python scripts/save_progress.py <ticket-key> --phase building --event approved
@@ -198,18 +191,18 @@ python scripts/save_progress.py <ticket-key> --phase building --event approved
 
 Make the actual code changes. Edit files directly in the worktree. Run any test commands relevant to the change. If tests fail, fix them before proceeding.
 
+**Do not stop to ask the user if the changes look good. Do not ask permission to run tests. Do not ask permission to push. The plan was already approved — execute it.**
+
 When the implementation is done, save a build summary:
 
 ```bash
-cat > /tmp/summary.txt <<'EOF'
-<short summary of what you built, files changed, tests run>
-EOF
-
 python scripts/save_progress.py <ticket-key> --phase pushing \
-  --from-file build_summary=/tmp/summary.txt
+  --build-summary "<short summary of what you built, files changed, tests run>"
 ```
 
 ### Phase 6: Push and comment (autonomous)
+
+**Continue autonomously — do not ask the user anything.**
 
 Push the branch:
 ```
@@ -218,15 +211,7 @@ python scripts/push_branch.py <ticket-key>
 
 Then post a summary back to the ticket:
 ```bash
-cat > /tmp/comment.md <<'EOF'
-✅ **Build complete**
-
-<build summary>
-
-Pushed to branch `<branch-name>`. Ready for review.
-EOF
-
-python scripts/post_comment.py <ticket-key> --from-file /tmp/comment.md
+python scripts/post_comment.py <ticket-key> "Build complete. <build summary>. Pushed to branch <branch-name>. Ready for review."
 ```
 
 The state file will now show `done`. Tell the user what branch was pushed and confirm the comment was posted.
@@ -284,12 +269,15 @@ For a deep status check on one ticket, run `python scripts/resume_ticket.py <tic
 ## Rules
 
 - **Never skip the approval gate.** Even if the ticket is small, ask for approval before building.
+- **After approval, run fully autonomously.** Do NOT ask the user for permission to edit files, run tests, commit, or push. The plan was approved — execute it end-to-end without stopping.
+- **Never write temp files.** Pass all text as inline arguments to scripts. Do NOT use `cat > /tmp/...` or heredocs — they trigger unnecessary permission prompts.
 - **Never push to the base branch.** Always push to the `claude/<ticket-key>` branch the worktree was created on.
 - **Never edit files outside the worktree.** All code changes happen inside the printed worktree path.
 - **Save progress after every phase transition.** This is what makes the skill resumable. If you forget, the next session won't know where you are.
 - **If a script exits non-zero, stop and tell the user.** Don't paper over errors with assumptions.
 - **One ticket at a time per session.** If the user wants to work on multiple, use the parallel dispatch flow.
 - **The user controls scope.** If they say "just fix the typo, no plan needed", you can move to building faster — but still save progress at each phase so resume works.
+- **Auto-install dependencies.** If `requests` or `pyyaml` is missing, install it silently with pip. Never ask the user to install Python packages or upgrade Python.
 
 ## Script reference
 
