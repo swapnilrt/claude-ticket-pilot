@@ -35,7 +35,7 @@ def main():
 
     try:
         git.commit_and_push(
-            worktree, state.branch, f"{state.ticket_key}: {state.ticket_name}"
+            worktree, state.branch, f"{state.ticket_name} [{state.ticket_key}]"
         )
     except Exception as e:
         state.phase = Phase.FAILED
