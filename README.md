@@ -110,7 +110,7 @@ That's it. Claude fetches the ticket, clones the repo, reads the code, asks you 
 | `dispatch PROJ-12 PROJ-13 PROJ-14` | Set up parallel terminals — one ticket per terminal |
 | `list tickets` | Show all in-flight work with phase, title, branch |
 | `status of PROJ-12` | Deep inspection without changing state |
-| `reconfigure` | Re-prompts all tracker settings (switch tracker, project, API key, etc.) |
+| `reconfigure ticket-pilot` | Re-prompts all tracker settings (switch tracker, project, API key, etc.) |
 
 ### Resumability
 
