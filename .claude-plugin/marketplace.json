@@ -7,7 +7,10 @@
   "plugins": [
     {
       "name": "claude-ticket-pilot",
-      "source": ".",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/swapnilrt/claude-ticket-pilot.git"
+      },
       "description": "Autonomous ticket workflow — brainstorm, plan, build, push via Jira or Plane"
     }
   ]
