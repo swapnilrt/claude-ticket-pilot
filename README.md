@@ -241,48 +241,108 @@ base_branch: main
 
 ## Ideal Ticket Example
 
-Here's a complete example of a well-structured ticket that Ticket Pilot can work on effectively:
+Here's a complete example of a well-structured ticket that Ticket Pilot can work on effectively. The more context you give, the fewer brainstorm questions Claude needs to ask and the better the plan will be.
 
-### Title
-**Add rate limiting to the /api/users endpoint**
+---
 
-### Description
-
-The `/api/users` endpoint currently has no rate limiting. We need to add a sliding-window rate limiter to prevent abuse.
-
-**Requirements:**
-- Limit to 100 requests per minute per API key
-- Return `429 Too Many Requests` with a `Retry-After` header when exceeded
-- Log rate-limited requests for monitoring
-- Add unit tests for the rate limiter
-
-**Acceptance criteria:**
-- [ ] Rate limiter middleware added to `/api/users`
-- [ ] Returns 429 with correct headers when limit exceeded
-- [ ] Existing tests still pass
-- [ ] New tests cover normal and rate-limited scenarios
+### Add a greeting CLI tool with configurable messages
 
 ````markdown
 ```claude
-repo: git@github.com:yourorg/yourapi.git
+repo: git@github.com:yourorg/hello-world-cli.git
 base_branch: main
-working_dir: services/api
+branch_prefix: claude/
 ```
 ````
+
+#### Context
+
+The repo currently contains a bare `main.py` that prints "Hello, World!" to stdout. It works but isn't configurable — every use case that needs a different greeting or a different target name has to edit the source. This ticket converts it into a proper CLI tool with argument parsing and a config file.
+
+#### Goal
+
+Turn the existing one-liner into a small CLI app that accepts a name and greeting via command-line args or a YAML config file. A user should be able to run `python main.py --name Alice` and get `Hello, Alice!` without touching any code.
+
+#### Scope
+
+##### `greeter.py` (the core module)
+
+- A `Greeter` class with two settings: `greeting` (default: `"Hello"`) and `name` (default: `"World"`)
+- A `greet()` method that returns the formatted string `"{greeting}, {name}!"`
+- Loads defaults from `config.yaml` if present in the working directory
+- CLI args override config file values, config file overrides hardcoded defaults
+
+##### `main.py` (the CLI entry point)
+
+- Uses `argparse` with `--greeting` and `--name` flags
+- Instantiates `Greeter` with the resolved settings and prints the result
+- Exit code 0 on success, 1 on invalid input
+
+##### File layout
+
+```
+greeter.py          # Greeter class + config loading
+main.py             # CLI entry point (argparse)
+config.yaml         # example config file (committed with defaults)
+tests/
+  test_greeter.py   # unit tests
+requirements.txt    # pyyaml
+README.md           # updated with usage examples
+```
+
+##### Tests
+
+- `test_greeter.py` covers:
+  - Default greeting returns `"Hello, World!"`
+  - Custom name returns `"Hello, Alice!"`
+  - Custom greeting + name returns `"Hi, Bob!"`
+  - Config file loading (use a temp file in the test)
+  - CLI args override config values
+
+#### Out of scope
+
+- Internationalization / translation
+- Web server or API mode
+- Interactive prompts — CLI flags only
+- Multiple output formats (JSON, etc.) — plain text only
+- Logging framework — `print()` is fine
+- Packaging / PyPI distribution
+
+#### Acceptance criteria
+
+- `python main.py` prints `Hello, World!` (backward compatible)
+- `python main.py --name Alice` prints `Hello, Alice!`
+- `python main.py --greeting Hi --name Bob` prints `Hi, Bob!`
+- A `config.yaml` with `greeting: Hey` + `python main.py --name Alice` prints `Hey, Alice!`
+- `python -m pytest tests/` passes with all tests green
+- README documents all three usage modes (defaults, CLI args, config file)
+
+#### Notes for the implementer
+
+- Keep it simple — this is a CLI tool, not a framework. No plugin system, no dependency injection.
+- Use `argparse` from the standard library, not click or typer.
+- `pyyaml` is the only external dependency.
+- The existing `main.py` is your starting point — refactor, don't rewrite from scratch.
+
+---
 
 ### What makes a good ticket
 
 | Element | Why it matters |
 |---|---|
 | **Clear title** | Claude uses it to understand scope at a glance |
-| **Specific requirements** | Reduces brainstorm questions, speeds up planning |
+| **Context section** | Explains the current state and why the change is needed |
+| **Specific scope** | File-by-file breakdown so Claude knows exactly what to create or modify |
+| **Out of scope** | Prevents Claude from over-engineering or drifting into unrelated changes |
 | **Acceptance criteria** | Claude uses these to verify the implementation and write tests |
 | **`claude` config block** | Required — tells Claude which repo, branch, and subdirectory to work in |
-| **Scope boundaries** | Prevents Claude from over-engineering or drifting into unrelated changes |
+| **Implementer notes** | Guides Claude's judgment on style and library choices |
 
 **Tips:**
-- Be specific about behavior ("return 429 with Retry-After header") rather than vague ("handle errors")
-- Mention existing patterns to follow ("use the same middleware pattern as auth.py")
+- Structure tickets with Context → Goal → Scope → Out of scope → Acceptance criteria
+- Be specific about behavior (`prints "Hello, Alice!"`) rather than vague (`handle names`)
+- Mention existing patterns to follow (`use the same middleware pattern as auth.py`)
+- List the file layout so Claude plans the right structure upfront
 - If you want to skip brainstorming, add `skip_brainstorm: true` to the config block
 - For monorepos, always set `working_dir` to narrow the codebase Claude reads
 
