@@ -191,6 +191,8 @@ python scripts/save_progress.py <ticket-key> --phase building --event approved
 
 Make the actual code changes. Edit files directly in the worktree. Run any test commands relevant to the change. If tests fail, fix them before proceeding.
 
+**All commit messages must include the ticket key as a prefix.** For example: `PROJ-12: Add validation to user input`. This applies to every commit made during the build phase.
+
 **Do not stop to ask the user if the changes look good. Do not ask permission to run tests. Do not ask permission to push. The plan was already approved — execute it.**
 
 When the implementation is done, save a build summary:
