@@ -123,6 +123,7 @@ That's it. Claude fetches the ticket, clones the repo, reads the code, asks you 
 | `dispatch PROJ-12 PROJ-13 PROJ-14` | Set up parallel terminals — one ticket per terminal |
 | `list tickets` | Show all in-flight work with phase, title, branch |
 | `status of PROJ-12` | Deep inspection without changing state |
+| `create ticket for <description>` | Generate a well-structured ticket and create it on your tracker |
 | `reconfigure ticket-pilot` | Re-prompts all tracker settings (switch tracker, project, API key, etc.) |
 
 ### Resumability
@@ -370,8 +371,10 @@ claude-ticket-pilot/
 │   ├── plugin.json               # Plugin manifest for Claude Code marketplace
 │   └── marketplace.json          # Marketplace catalog
 ├── skills/
-│   └── ticket-pilot/
-│       └── SKILL.md              # Instructions Claude reads at runtime
+│   ├── ticket-pilot/
+│   │   └── SKILL.md              # Work-on-ticket skill instructions
+│   └── create-ticket/
+│       └── SKILL.md              # Create-ticket skill instructions
 ├── SKILL.md                      # Root copy (kept in sync with skills/)
 ├── plugin.json                   # Extended manifest (metadata, env var schema)
 ├── requirements.txt              # requests, pyyaml
@@ -386,6 +389,8 @@ claude-ticket-pilot/
 │   ├── _common.py                # Bootstrap: env vars, adapter factory, path helpers
 │   ├── check_env.py              # Validate required env vars are set
 │   ├── setup_env.py              # Write tracker config to shell profile
+│   ├── create_ticket.py          # Create a new ticket on the tracker
+│   ├── transition_ticket.py      # Move ticket status (In Progress, In Review, etc.)
 │   ├── start_ticket.py           # Initialize ticket: fetch → parse → worktree → state
 │   ├── resume_ticket.py          # Load state and print context for Claude
 │   ├── save_progress.py          # Persist phase transitions

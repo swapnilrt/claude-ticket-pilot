@@ -143,6 +143,13 @@ Run `python scripts/start_ticket.py <ticket-key>` and read its output carefully.
 
 **If `start_ticket.py` fails because the ticket has no `​```claude` config block**, stop and tell the user. Show them the format. Do not try to invent a repo URL.
 
+**Move the ticket to "In Progress"** (or equivalent) on the tracker:
+```bash
+python scripts/transition_ticket.py <ticket-key> --list
+python scripts/transition_ticket.py <ticket-key> --to "In Progress"
+```
+If the transition fails (e.g. the status name is different), use `--list` to see available transitions and pick the closest match. If no "In Progress" equivalent exists, skip this step.
+
 ### Phase 2: Read the codebase
 
 `cd` into the worktree path printed by `start_ticket.py`. Use `ls`, `find`, and targeted `grep`/file reads to understand the area of the code the ticket touches. **Do not read the whole repo** — be focused. 5-15 file reads is usually enough.
@@ -249,7 +256,13 @@ Then post a summary back to the ticket:
 python scripts/post_comment.py <ticket-key> "Build complete. <build summary>. Pushed to branch <branch-name>. Ready for review."
 ```
 
-The state file will now show `done`. Tell the user what branch was pushed and confirm the comment was posted.
+**Move the ticket to "In Review"** (or equivalent) on the tracker:
+```bash
+python scripts/transition_ticket.py <ticket-key> --to "In Review"
+```
+If "In Review" doesn't exist, try "Review", "Code Review", or use `--list` to find the right one. If no review status exists, skip this step.
+
+The state file will now show `done`. Tell the user what branch was pushed, the ticket status was updated, and confirm the comment was posted.
 
 ---
 
@@ -326,5 +339,8 @@ For a deep status check on one ticket, run `python scripts/resume_ticket.py <tic
 | `poll_comments.py <key>` | Poll tracker for new comments; advances phase when found |
 | `list_tickets.py [--all]` | Show all tickets in state |
 | `dispatch_parallel.py <key1> <key2> ...` | Set up multiple tickets and print launch commands |
+| `create_ticket.py --title T --description D` | Create a new ticket on the tracker |
+| `transition_ticket.py <key> --to "Status"` | Move a ticket to a new status |
+| `transition_ticket.py <key> --list` | List available status transitions |
 
 All scripts live in `scripts/` relative to this skill's root. Run them with `python scripts/<name>.py ...` from the skill directory, or use the absolute path.

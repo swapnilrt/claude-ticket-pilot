@@ -160,3 +160,67 @@ class JiraAdapter(TrackerAdapter):
         )
         r.raise_for_status()
         return r.json()["id"]
+
+    def get_transitions(self, issue_id: str) -> list[dict]:
+        r = requests.get(
+            f"{self.base}/issue/{issue_id}/transitions",
+            headers=self.headers,
+            timeout=30,
+        )
+        r.raise_for_status()
+        return [
+            {"id": t["id"], "name": t["name"]}
+            for t in r.json().get("transitions", [])
+        ]
+
+    def transition_ticket(self, issue_id: str, transition_name: str) -> str:
+        transitions = self.get_transitions(issue_id)
+        match = None
+        for t in transitions:
+            if t["name"].lower() == transition_name.lower():
+                match = t
+                break
+        if not match:
+            available = ", ".join(t["name"] for t in transitions)
+            raise ValueError(
+                f"Transition '{transition_name}' not available. Available: {available}"
+            )
+        r = requests.post(
+            f"{self.base}/issue/{issue_id}/transitions",
+            headers=self.headers,
+            json={"transition": {"id": match["id"]}},
+            timeout=30,
+        )
+        r.raise_for_status()
+        return match["name"]
+
+    def create_ticket(self, title: str, description: str) -> "Ticket":
+        if self.variant == "cloud":
+            payload = {
+                "fields": {
+                    "project": {"key": self.project},
+                    "summary": title,
+                    "description": _markdown_to_adf(description),
+                    "issuetype": {"name": "Task"},
+                }
+            }
+        else:
+            payload = {
+                "fields": {
+                    "project": {"key": self.project},
+                    "summary": title,
+                    "description": description,
+                    "issuetype": {"name": "Task"},
+                }
+            }
+
+        r = requests.post(
+            f"{self.base}/issue",
+            headers=self.headers,
+            json=payload,
+            timeout=30,
+        )
+        r.raise_for_status()
+        data = r.json()
+        # Fetch the full ticket to get all fields
+        return self.get_ticket_by_key(data["key"])

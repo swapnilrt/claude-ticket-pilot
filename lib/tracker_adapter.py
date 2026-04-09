@@ -34,3 +34,21 @@ class TrackerAdapter(ABC):
     def add_comment(self, issue_id: str, body_markdown: str) -> str:
         """Post a markdown comment. Returns the comment ID."""
         ...
+
+    @abstractmethod
+    def create_ticket(self, title: str, description: str) -> Ticket:
+        """Create a new ticket. Returns the created Ticket."""
+        ...
+
+    @abstractmethod
+    def get_transitions(self, issue_id: str) -> list[dict]:
+        """Get available status transitions for a ticket.
+
+        Returns list of dicts: [{id, name}]
+        """
+        ...
+
+    @abstractmethod
+    def transition_ticket(self, issue_id: str, transition_name: str) -> str:
+        """Move a ticket to a new status. Returns the new status name."""
+        ...

@@ -95,3 +95,44 @@ class PlaneAdapter(TrackerAdapter):
         )
         r.raise_for_status()
         return r.json()["id"]
+
+    def get_transitions(self, issue_id: str) -> list[dict]:
+        # Plane uses state groups: backlog, unstarted, started, completed, cancelled
+        r = requests.get(f"{self.base}/states/", headers=self.headers, timeout=30)
+        r.raise_for_status()
+        data = r.json()
+        items = data.get("results", data) if isinstance(data, dict) else data
+        return [{"id": s["id"], "name": s["name"]} for s in items]
+
+    def transition_ticket(self, issue_id: str, transition_name: str) -> str:
+        states = self.get_transitions(issue_id)
+        match = None
+        for s in states:
+            if s["name"].lower() == transition_name.lower():
+                match = s
+                break
+        if not match:
+            available = ", ".join(s["name"] for s in states)
+            raise ValueError(
+                f"State '{transition_name}' not available. Available: {available}"
+            )
+        r = requests.patch(
+            f"{self.base}/issues/{issue_id}/",
+            headers=self.headers,
+            json={"state": match["id"]},
+            timeout=30,
+        )
+        r.raise_for_status()
+        return match["name"]
+
+    def create_ticket(self, title: str, description: str) -> Ticket:
+        html_body = description.replace("\n\n", "</p><p>").replace("\n", "<br>")
+        html = f"<p>{html_body}</p>"
+        r = requests.post(
+            f"{self.base}/issues/",
+            headers=self.headers,
+            json={"name": title, "description_html": html},
+            timeout=30,
+        )
+        r.raise_for_status()
+        return self._to_ticket(r.json())
