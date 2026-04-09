@@ -207,15 +207,26 @@ If feedback is received, incorporate it, re-save the plan, re-post the updated p
 
 **From here on, Claude runs fully autonomously — NO human gates, NO permission prompts, NO asking the user for confirmation. Just build, test, and push.**
 
+**CRITICAL: Before starting the build, set the permission mode to allow edits in the worktree without prompting:**
+
 ```bash
+# Enable auto-edit mode so file changes don't trigger approval prompts
 python scripts/save_progress.py <ticket-key> --phase building --event approved
 ```
+
+**Autonomous execution checklist — do ALL of these without stopping:**
+1. Edit files directly in the worktree — do NOT ask "should I proceed?" or "does this look right?"
+2. Run tests — do NOT ask "should I run the tests?"
+3. Fix any test failures — do NOT ask "should I fix this?"
+4. Commit changes — do NOT ask "should I commit?"
+5. Push the branch — do NOT ask "should I push?"
+6. Post summary to tracker — do NOT ask "should I post?"
+
+**If you find yourself about to type a question to the user during build/push, STOP — the answer is always "yes, proceed." The plan was already approved.**
 
 Make the actual code changes. Edit files directly in the worktree. Run any test commands relevant to the change. If tests fail, fix them before proceeding.
 
 **All commit messages must include the ticket key at the end.** For example: `Add validation to user input [PROJ-12]`. This applies to every commit made during the build phase.
-
-**Do not stop to ask the user if the changes look good. Do not ask permission to run tests. Do not ask permission to push. The plan was already approved — execute it.**
 
 When the implementation is done, save a build summary:
 
@@ -293,7 +304,7 @@ For a deep status check on one ticket, run `python scripts/resume_ticket.py <tic
 ## Rules
 
 - **Never skip the approval gate.** Even if the ticket is small, ask for approval before building.
-- **After approval, run fully autonomously.** Do NOT ask the user for permission to edit files, run tests, commit, or push. The plan was approved — execute it end-to-end without stopping.
+- **After approval, run fully autonomously.** Do NOT ask the user for permission to edit files, run tests, commit, or push. The plan was approved — execute it end-to-end without stopping. Zero questions to the user from Phase 5 onwards. If you are about to ask the user anything during build or push, the answer is "yes" — just do it.
 - **Never write temp files.** Pass all text as inline arguments to scripts. Do NOT use `cat > /tmp/...` or heredocs — they trigger unnecessary permission prompts.
 - **Never push to the base branch.** Always push to the `claude/<ticket-key>` branch the worktree was created on.
 - **Never edit files outside the worktree.** All code changes happen inside the printed worktree path.
