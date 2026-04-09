@@ -47,6 +47,21 @@ You have a ticket. You want Claude to implement it. But real engineering work is
 
 On first use, Claude will detect missing environment variables and walk you through tracker setup interactively. The [superpowers](https://github.com/obra/superpowers) dependency is installed automatically.
 
+### Recommended permissions
+
+To avoid repeated permission prompts, add these allow rules to your Claude Code settings (`~/.claude/settings.json` → `permissions.allow`):
+
+```json
+"Bash(python3*scripts/*.py*)",
+"Bash(python*scripts/*.py*)",
+"Bash(source*)",
+"Bash(cd*&&*python*scripts/*.py*)",
+"Bash(python3*-m pip install*)",
+"Bash(python3*-c \"import*\")"
+```
+
+Or when prompted for the first time, select **"Yes, and don't ask again"** to auto-add the rule.
+
 ### Add a config block to your ticket
 
 In your Jira or Plane ticket description, insert a code block with:
