@@ -56,18 +56,46 @@ def _extract_adf_claude_block(description: str) -> Optional[str]:
         return None
 
 
+def _extract_code_block_text(node: dict) -> str:
+    """Extract text content from an ADF codeBlock node."""
+    parts = []
+    for child in node.get("content", []):
+        if child.get("type") == "text":
+            parts.append(child.get("text", ""))
+    return "\n".join(parts)
+
+
 def _walk_adf_for_claude(node: dict) -> Optional[str]:
-    """Walk ADF tree to find codeBlock with language=claude."""
+    """Walk ADF tree to find a claude config code block.
+
+    Matches any of:
+    1. codeBlock with language=claude (ideal)
+    2. Any codeBlock whose text content starts with 'claude' on the first line
+    3. Any codeBlock containing 'repo:' (fallback for blocks without a language set)
+    """
     if not isinstance(node, dict):
         return None
+
+    # Collect all code blocks, prioritize by match quality
     if node.get("type") == "codeBlock":
         attrs = node.get("attrs", {})
+        text = _extract_code_block_text(node)
+
+        # Priority 1: explicit language=claude
         if attrs.get("language") == "claude":
-            parts = []
-            for child in node.get("content", []):
-                if child.get("type") == "text":
-                    parts.append(child.get("text", ""))
-            return "\n".join(parts)
+            return text
+
+        # Priority 2: content starts with "claude" on first line
+        first_line = text.strip().split("\n")[0].strip().lower() if text.strip() else ""
+        if first_line == "claude":
+            # Strip the "claude" header line and return the rest
+            lines = text.strip().split("\n")[1:]
+            return "\n".join(lines)
+
+        # Priority 3: contains "repo:" — likely a claude config without proper language tag
+        if "repo:" in text and not attrs.get("language"):
+            return text
+
     for child in node.get("content", []):
         result = _walk_adf_for_claude(child)
         if result is not None:

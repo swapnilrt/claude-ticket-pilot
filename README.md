@@ -211,7 +211,7 @@ export TRACKER_PROJECT=PROJ
 
 Every ticket needs a `` ```claude `` config block in its description telling Claude which repo to work in.
 
-**Plane / Jira Cloud** (fenced code block):
+**Plane** (fenced code block in markdown):
 
 ````markdown
 ```claude
@@ -219,6 +219,17 @@ repo: git@github.com:yourorg/yourrepo.git
 base_branch: main
 ```
 ````
+
+**Jira Cloud** (use the code snippet block via `/` menu or `{}` toolbar button):
+
+In the Jira editor, insert a **Code snippet** block (type `/code` or click `{}` in the toolbar). If the language selector is available, set it to `claude`. If not, just paste the config — the parser will detect it automatically:
+
+```
+repo: git@github.com:yourorg/yourrepo.git
+base_branch: main
+```
+
+> **Tip:** Jira Cloud doesn't always allow custom language names. That's fine — any code block containing `repo:` will be detected as a claude config block.
 
 **Jira Server** (wiki markup):
 
