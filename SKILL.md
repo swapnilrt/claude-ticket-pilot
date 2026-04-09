@@ -242,27 +242,31 @@ python scripts/save_progress.py <ticket-key> --phase pushing \
   --build-summary "<short summary of what you built, files changed, tests run>"
 ```
 
-### Phase 6: Push and comment (autonomous)
+### Phase 6: Push, comment, and update status (autonomous)
 
 **Continue autonomously — do not ask the user anything.**
 
-Push the branch:
+**You MUST complete ALL 3 steps below. Do not stop after pushing.**
+
+**Step 1 — Push the branch:**
 ```
 python scripts/push_branch.py <ticket-key>
 ```
 
-Then post a summary back to the ticket:
+**Step 2 — Post a completion summary as a comment on the ticket:**
 ```bash
-python scripts/post_comment.py <ticket-key> "Build complete. <build summary>. Pushed to branch <branch-name>. Ready for review."
+python scripts/post_comment.py <ticket-key> "Build complete. <list of files changed, what was built, tests run/passed>. Pushed to branch <branch-name>. Ready for review."
 ```
+**This step is mandatory.** The comment must include: what was built, files changed, tests run, and the branch name.
 
-**Move the ticket to "In Review"** (or equivalent) on the tracker:
+**Step 3 — Move the ticket to "In Review":**
 ```bash
+python scripts/transition_ticket.py <ticket-key> --list
 python scripts/transition_ticket.py <ticket-key> --to "In Review"
 ```
-If "In Review" doesn't exist, try "Review", "Code Review", or use `--list` to find the right one. If no review status exists, skip this step.
+If "In Review" doesn't exist, try "Review", "Code Review", "Done", or use `--list` output to find the closest match.
 
-The state file will now show `done`. Tell the user what branch was pushed, the ticket status was updated, and confirm the comment was posted.
+**Phase 6 is NOT complete until all 3 steps have run.** Tell the user what branch was pushed, confirm the summary was posted to the ticket, and confirm the ticket status was updated.
 
 ---
 
