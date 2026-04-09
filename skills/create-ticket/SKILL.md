@@ -97,3 +97,4 @@ Optionally ask: **"Want me to start working on it now?"** — if yes, hand off t
 - **Do NOT create the ticket without user confirmation.** Always show the draft first.
 - **Pass text as inline arguments.** Do NOT write temp files.
 - **NEVER delete files, directories, or data without explicit user permission.** This skill creates — it does not destroy.
+- **NEVER edit, create, or modify files outside the project git directory.** Every change must be restorable via git. No system files, no shell profiles, no paths outside the git repo.

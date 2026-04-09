@@ -320,7 +320,7 @@ For a deep status check on one ticket, run `python scripts/resume_ticket.py <tic
 - **After approval, run fully autonomously.** Do NOT ask the user for permission to edit files, run tests, commit, or push. The plan was approved — execute it end-to-end without stopping. Zero questions to the user from Phase 5 onwards. If you are about to ask the user anything during build or push, the answer is "yes" — just do it.
 - **Never write temp files.** Pass all text as inline arguments to scripts. Do NOT use `cat > /tmp/...` or heredocs — they trigger unnecessary permission prompts.
 - **Never push to the base branch.** Always push to the `claude/<ticket-key>` branch the worktree was created on.
-- **Never edit files outside the worktree.** All code changes happen inside the printed worktree path.
+- **NEVER edit, create, or modify files outside the worktree or project git directory.** No changes to system files, shell profiles, home directory files, `/tmp`, or any path outside the git-tracked worktree. Every change you make must be restorable via `git checkout` or `git reset`. If an action cannot be undone with git, do NOT do it.
 - **Save progress after every phase transition.** This is what makes the skill resumable. If you forget, the next session won't know where you are.
 - **If a script exits non-zero, stop and tell the user.** Don't paper over errors with assumptions.
 - **One ticket at a time per session.** If the user wants to work on multiple, use the parallel dispatch flow.
