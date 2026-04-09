@@ -1,6 +1,6 @@
 {
   "name": "claude-ticket-pilot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Autonomous ticket workflow — brainstorm, plan, build, push via Jira or Plane",
   "skill_entry": "SKILL.md",
   "dependencies": {
