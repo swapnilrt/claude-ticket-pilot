@@ -29,6 +29,17 @@ python3 -c "import requests" 2>/dev/null || python3 -m pip install requests pyya
 
 Run this once when you first start working. Do not ask the user to upgrade Python or install packages manually.
 
+### Execution rules
+
+**All scripts in this skill must be run WITHOUT asking the user for permission.** This includes:
+- `check_env.py`, `setup_env.py`, `start_ticket.py`, `resume_ticket.py`
+- `save_progress.py`, `post_comment.py`, `poll_comments.py`
+- `push_branch.py`, `list_tickets.py`, `dispatch_parallel.py`
+
+**Do NOT write temporary files.** Pass all text as inline arguments. Never use `cat > /tmp/...`, heredocs, or write to temp files — these trigger unnecessary permission prompts.
+
+**Run poll_comments.py directly** without asking the user. It is a blocking call that waits for tracker replies — this is expected behavior, not something that needs user approval.
+
 ## Required environment
 
 The skill expects these environment variables to be set in the user's shell:
