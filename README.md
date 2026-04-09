@@ -47,16 +47,14 @@ You have a ticket. You want Claude to implement it. But real engineering work is
 
 On first use, Claude will detect missing environment variables and walk you through tracker setup interactively. The [superpowers](https://github.com/obra/superpowers) dependency is installed automatically.
 
-### Add a spec block to your ticket
+### Add a config block to your ticket
 
-In your Jira or Plane ticket description, add:
+In your Jira or Plane ticket description, insert a code block with:
 
-````markdown
-```claude
+```
 repo: git@github.com:yourorg/yourrepo.git
 base_branch: main
 ```
-````
 
 ### Go
 
@@ -209,36 +207,25 @@ export TRACKER_PROJECT=PROJ
 
 ## The Ticket Spec Block
 
-Every ticket needs a `` ```claude `` config block in its description telling Claude which repo to work in.
-
-**Plane** (fenced code block in markdown):
-
-````markdown
-```claude
-repo: git@github.com:yourorg/yourrepo.git
-base_branch: main
-```
-````
-
-**Jira Cloud** (use the code snippet block via `/` menu or `{}` toolbar button):
-
-In the Jira editor, insert a **Code snippet** block (type `/code` or click `{}` in the toolbar). If the language selector is available, set it to `claude`. If not, just paste the config — the parser will detect it automatically:
+Every ticket needs a config block in its description telling Claude which repo to work in. **On any platform**, just insert a code block and paste:
 
 ```
 repo: git@github.com:yourorg/yourrepo.git
 base_branch: main
 ```
 
-> **Tip:** Jira Cloud doesn't always allow custom language names. That's fine — any code block containing `repo:` will be detected as a claude config block.
+That's it. The parser auto-detects the config from any code block containing `repo:` — no special language tag required. Works on Plane, Jira Cloud, and Jira Server.
 
-**Jira Server** (wiki markup):
+<details>
+<summary><strong>Platform-specific details</strong></summary>
 
-```
-{code:claude}
-repo: git@github.com:yourorg/yourrepo.git
-base_branch: main
-{code}
-```
+**Plane**: Use a fenced code block in markdown. Optionally set the language to `claude`.
+
+**Jira Cloud**: Insert a code snippet via the `/code` menu or `{}` toolbar button. Paste the config inside.
+
+**Jira Server**: Use wiki markup `{code:claude}...{code}` or a plain code block.
+
+</details>
 
 | Field | Required | Default | Purpose |
 |---|---|---|---|
