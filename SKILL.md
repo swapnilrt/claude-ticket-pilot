@@ -326,6 +326,7 @@ For a deep status check on one ticket, run `python scripts/resume_ticket.py <tic
 - **One ticket at a time per session.** If the user wants to work on multiple, use the parallel dispatch flow.
 - **The user controls scope.** If they say "just fix the typo, no plan needed", you can move to building faster — but still save progress at each phase so resume works.
 - **Auto-install dependencies.** If `requests` or `pyyaml` is missing, install it silently with pip. Never ask the user to install Python packages or upgrade Python.
+- **NEVER delete files, directories, branches, or data without explicit user permission.** If the plan calls for removing a file, stop and ask the user before deleting. This applies to `rm`, `git branch -D`, `git clean`, file deletions, and any other destructive operation. Refactoring should move or rename, not delete, unless the user explicitly approves.
 
 ## Script reference
 

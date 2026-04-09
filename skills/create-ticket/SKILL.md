@@ -96,3 +96,4 @@ Optionally ask: **"Want me to start working on it now?"** — if yes, hand off t
 - **Always include acceptance criteria.** These become the test plan.
 - **Do NOT create the ticket without user confirmation.** Always show the draft first.
 - **Pass text as inline arguments.** Do NOT write temp files.
+- **NEVER delete files, directories, or data without explicit user permission.** This skill creates — it does not destroy.
