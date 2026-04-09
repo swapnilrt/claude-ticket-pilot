@@ -90,27 +90,29 @@ That's it. Claude fetches the ticket, clones the repo, reads the code, asks you 
 │                    INTERACTIVE MODE                       │
 │         (all communication via tracker comments)          │
 │                                                           │
-│  1. Start ──→ 2. Read Code ──→ 3. Ask Questions          │
-│                                      │                    │
-│                            ┌─── poll for reply ◄──┐      │
-│                            ▼                      │      │
-│                    4. Write Plan ──→ Post Plan     │      │
-│                            │              │       │      │
-│                            ▼         poll for     │      │
-│                      Approved? ──no──► feedback ──┘      │
+│  1. Start ──→ [ticket → In Progress]                     │
+│       │                                                   │
+│  2. Read Code ──→ 3. Ask Questions                       │
 │                            │                              │
-│                           yes                             │
-├───────────────────────────┼───────────────────────────────┤
+│                  ┌─── poll for reply ◄──┐                │
+│                  ▼                      │                │
+│          4. Write Plan ──→ Post Plan    │                │
+│                  │              │       │                │
+│                  ▼         poll for     │                │
+│            Approved? ──no──► feedback ──┘                │
+│                  │                                        │
+│                 yes                                       │
+├──────────────────┼────────────────────────────────────────┤
 │                    AUTONOMOUS MODE                         │
 │            (no human gates from here)                      │
-│                            │                              │
-│                    5. Build & Test                         │
-│                            │                              │
-│                    6. Push Branch                          │
-│                            │                              │
-│                    7. Post Summary                         │
-│                            │                              │
-│                          Done                             │
+│                  │                                        │
+│          5. Build & Test                                  │
+│                  │                                        │
+│          6. Push Branch                                   │
+│                  │                                        │
+│          7. Post Summary ──→ [ticket → In Review]        │
+│                  │                                        │
+│                Done                                       │
 └───────────────────────────────────────────────────────────┘
 ```
 
@@ -455,6 +457,12 @@ Runs 12 stages through the full state machine with a fake tracker and dry-run gi
 
 **Crash recovery.** If a session dies mid-phase, `resume PROJ-12` shows exactly where things stand. The "next action" hint tells Claude what to do.
 
+**Automatic status transitions.** Tickets move to "In Progress" when work starts and "In Review" after pushing. If your tracker uses different status names, the skill auto-discovers available transitions with `--list` and picks the closest match.
+
+**No deletions without permission.** The skill never deletes files, branches, or data without asking you first. All changes are git-restorable.
+
+**No changes outside the repo.** The skill only modifies files inside the git worktree. No system files, home directory, or paths outside the project are touched.
+
 ---
 
 ## Troubleshooting
@@ -468,6 +476,11 @@ Runs 12 stages through the full state machine with a fake tracker and dry-run gi
 | Jira API returns 401 | Auth mismatch | Use `bearer` for Cloud, `basic` for Server. Check `TRACKER_USERNAME` for basic. |
 | Jira API returns 403 on comment | Missing permission | Check "Add Comments" in Jira project permissions |
 | Comment not appearing in tracker | UI lag | Check via API directly (see docs) |
+| `Transition 'In Review' not available` | Tracker uses different status names | Run `transition_ticket.py <key> --list` to see available statuses |
+| `No ```claude config block found` (Jira Cloud) | Code block has no language set | Any code block with `repo:` works — no language tag needed |
+| Poll times out after 3600s | No reply on tracker within timeout | Reply on the tracker or increase `PLANE_POLL_TIMEOUT` |
+| `ModuleNotFoundError: requests` | Python deps not installed | Run `python3 -m pip install requests pyyaml` |
+| Permission prompts on every command | Claude Code security feature | Add allow rules to `~/.claude/settings.json` (see Install section) |
 
 ---
 

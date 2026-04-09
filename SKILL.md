@@ -336,6 +336,8 @@ For a deep status check on one ticket, run `python scripts/resume_ticket.py <tic
 
 | Script | Purpose |
 |---|---|
+| `check_env.py` | Validate required env vars are set |
+| `setup_env.py --tracker-type T --base-url U ...` | Write tracker config to shell profile |
 | `start_ticket.py <key>` | Fetch + parse + worktree + state init for one ticket |
 | `resume_ticket.py <key>` | Print full state for resuming (no side effects) |
 | `save_progress.py <key> --phase <p> [opts]` | Update state after a phase transition |
